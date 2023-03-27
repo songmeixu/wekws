@@ -7,13 +7,13 @@ stage=0
 stop_stage=4
 num_keywords=2
 
-config=conf/ds_tcn.yaml
+config=conf/mdtc_small.yaml
 norm_mean=true
 norm_var=true
-gpus="0,1"
+gpus="0"
 
 checkpoint=
-dir=exp/ds_tcn
+dir=exp/mdtc_small
 
 num_average=30
 score_checkpoint=$dir/avg_${num_average}.pt
