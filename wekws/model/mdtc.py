@@ -103,7 +103,7 @@ class TCNBlock(nn.Module):
             torch.Tensor(B, D, T): outputs
             torch.Tensor(B, D, self.padding): new cache
         """
-        if cache.size(0) == 0:
+        if torch.numel(cache) == 0:
             outputs = F.pad(inputs, (self.padding, 0), value=0.0)
         else:
             outputs = torch.cat((cache, inputs), dim=2)
@@ -184,7 +184,7 @@ class TCNStack(nn.Module):
         out_caches = []
         offset = 0
         for block in self.res_blocks:
-            if in_cache.size(0) > 0:
+            if torch.numel(in_cache) > 0:
                 c_in = in_cache[:, :, offset:offset + block.padding]
             else:
                 c_in = torch.zeros(0, 0, 0)
@@ -244,7 +244,7 @@ class MDTC(nn.Module):
         outputs_list = []
         out_caches = []
         offset = 0
-        if in_cache.size(0) > 0:
+        if torch.numel(in_cache) > 0:
             c_in = in_cache[:, :, offset:offset + self.preprocessor.padding]
         else:
             c_in = torch.zeros(0, 0, 0)
@@ -254,7 +254,7 @@ class MDTC(nn.Module):
         out_caches.append(c_out)
         offset += self.preprocessor.padding
         for block in self.blocks:
-            if in_cache.size(0) > 0:
+            if torch.numel(in_cache) > 0:
                 c_in = in_cache[:, :, offset:offset + block.padding]
             else:
                 c_in = torch.zeros(0, 0, 0)
