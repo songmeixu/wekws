@@ -37,3 +37,4 @@ data
 raw_wav
 tensorboard
 **/*build*
+fc_base
