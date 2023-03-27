@@ -50,8 +50,8 @@ def plot_det_curve(
 
     plt.xlim([0, xlim])
     plt.ylim([0, ylim])
-    plt.xticks(range(0, xlim + x_step, x_step))
-    plt.yticks(range(0, ylim + y_step, y_step))
+    plt.xticks(np.arange(0, xlim + x_step, x_step))
+    plt.yticks(np.arange(0, ylim + y_step, y_step))
     plt.xlabel('False Alarm Per Hour')
     plt.ylabel('False Rejection Rate (\\%)')
     plt.grid(linestyle='--')
@@ -75,13 +75,13 @@ if __name__ == '__main__':
         type=int,
         default=5,
         help='xlim：range of x-axis, x is false alarm per hour')
-    parser.add_argument('--x_step', type=int, default=1, help='step on x-axis')
+    parser.add_argument('--x_step', type=float, default=1, help='step on x-axis')
     parser.add_argument(
         '--ylim',
         type=int,
         default=35,
         help='ylim：range of y-axis, y is false rejection rate')
-    parser.add_argument('--y_step', type=int, default=5, help='step on y-axis')
+    parser.add_argument('--y_step', type=float, default=5, help='step on y-axis')
 
     args = parser.parse_args()
 

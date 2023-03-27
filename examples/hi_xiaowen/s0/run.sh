@@ -111,6 +111,15 @@ if [ ${stage} -le 3 ] && [ ${stop_stage} -ge 3 ]; then
       --score_file $result_dir/score.txt \
       --stats_file $result_dir/stats.${keyword}.txt
   done
+
+  python wekws/bin/plot_det_curve.py \
+    --keywords_dict dict/words.txt \
+    --stats_dir $result_dir \
+    --figure_file $result_dir/det.png \
+    --xlim 2 \
+    --x_step 0.2 \
+    --ylim 2 \
+    --y_step 0.5
 fi
 
 
