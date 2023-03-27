@@ -29,8 +29,7 @@ def get_args():
     parser.add_argument('--config', required=True, help='config file')
     parser.add_argument('--checkpoint', required=True, help='checkpoint model')
     parser.add_argument('--jit_model', required=True, help='output jit model')
-    args = parser.parse_args()
-    return args
+    return parser.parse_args()
 
 
 def main():
@@ -48,7 +47,7 @@ def main():
 
     script_model = torch.jit.script(model)
     script_model.save(args.jit_model)
-    print('Export model successfully, see {}'.format(args.jit_model))
+    print(f'Export model successfully, see {args.jit_model}')
 
 
 if __name__ == '__main__':

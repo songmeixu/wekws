@@ -31,8 +31,7 @@ def get_args():
                         required=True,
                         help='output onnx model')
     parser.add_argument('--checkpoint', required=True, help='checkpoint model')
-    args = parser.parse_args()
-    return args
+    return parser.parse_args()
 
 
 def main():

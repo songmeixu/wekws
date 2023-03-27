@@ -22,6 +22,6 @@ with open(scp, 'r') as f, open(dur_scp, 'w') as fout:
         frames = len(waveform[0])
         duration = frames / float(rate)
         total_duration += duration
-        fout.write('{} {}\n'.format(wav_id, duration))
-    print('process {} utts'.format(cnt))
-    print('total {} s'.format(total_duration))
+        fout.write(f'{wav_id} {duration}\n')
+    print(f'process {cnt} utts')
+    print(f'total {total_duration} s')
