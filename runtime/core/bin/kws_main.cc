@@ -14,6 +14,7 @@
 
 
 #include <iostream>
+#include <fstream>
 #include <string>
 
 #include "frontend/feature_pipeline.h"
@@ -22,15 +23,20 @@
 #include "utils/log.h"
 
 int main(int argc, char* argv[]) {
-  if (argc != 5) {
-    LOG(FATAL) << "Usage: kws_main fbank_dim(int) batch_size(int) "
+  if (argc != 6) {
+    LOG(FATAL) << "Usage: kws_main fbank_dim(int) batch_size(int) threshold "
                << "kws_model_path test_wav_path";
   }
 
   const int num_bins = std::stoi(argv[1]);  // Fbank feature dim
   const int batch_size = std::stoi(argv[2]);
-  const std::string model_path = argv[3];
-  const std::string wav_path = argv[4];
+  const float threshold = std::stof(argv[3]);
+  const std::string model_path = argv[4];
+  const std::string wav_path = argv[5];
+
+  const int window_shift = 0;
+  int skip_size = 0;
+  int frame_count = 0;
 
   wenet::WavReader wav_reader(wav_path);
   int num_samples = wav_reader.num_samples();
@@ -42,23 +48,49 @@ int main(int argc, char* argv[]) {
 
   wekws::KeywordSpotting spotter(model_path);
 
+  std::ofstream featfile;
+  featfile.open("feats_cpp.txt");
+
   // Simulate streaming, detect batch by batch
-  int offset = 0;
   while (true) {
     std::vector<std::vector<float>> feats;
     bool ok = feature_pipeline.Read(batch_size, &feats);
     std::vector<std::vector<float>> prob;
-    spotter.Forward(feats, &prob);
-    for (int i = 0; i < prob.size(); i++) {
-      std::cout << "frame " << offset + i << " prob";
-      for (int j = 0; j < prob[i].size(); j++) {
-        std::cout << " " << prob[i][j];
+
+    for (int i = 0; i < feats.size(); i++) {
+      for (int j = 0; j < feats[i].size(); j++) {
+        if (j % 4 == 0) {
+          featfile << std::endl;
+        }
+        featfile << feats[i][j] << " ";
       }
-      std::cout << std::endl;
+    }
+
+    spotter.Forward(feats, &prob);
+
+    for (int t = 0; t < prob.size(); t++, frame_count++) {
+      if (skip_size == 0) {
+        std::cout << "frame " << frame_count << " prob";
+        for (int i = 0; i < prob[t].size(); i++) {
+          std::cout << " " << prob[t][i];
+
+          if (prob[t][i] >= threshold) {
+            // std::cout << "keyword_index=" << i << " detected" << ", frame_count=" << frame_count << std::endl;
+            // skip_size = window_shift;
+            // break;
+          }
+        }
+        std::cout << std::endl;
+      } else {
+        skip_size--;
+        continue;
+      }
     }
     // Reach the end of feature pipeline
     if (!ok) break;
-    offset += prob.size();
   }
+
+  featfile.close();
+
   return 0;
 }

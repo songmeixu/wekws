@@ -51,12 +51,17 @@ static int RecordCallback(const void* input, void* output,
 }
 
 int main(int argc, char* argv[]) {
-  if (argc != 4) {
-    LOG(FATAL) << "Usage: kws_main fbank_dim batch_size kws_model_path";
+  if (argc != 5) {
+    LOG(FATAL) << "Usage: stream_kws_main fbank_dim batch_size threshold kws_model_path";
   }
   const int num_bins = std::stoi(argv[1]);  // Fbank feature dim
   const int batch_size = std::stoi(argv[2]);
-  const std::string model_path = argv[3];
+  const float threshold = std::stof(argv[3]);
+  const std::string model_path = argv[4];
+
+  const int window_shift = 50;
+  int skip_size = 0;
+  int frame_count = 0;
 
   wenet::FeaturePipelineConfig feature_config(num_bins, 16000);
   g_feature_pipeline = std::make_shared<wenet::FeaturePipeline>(feature_config);
@@ -91,12 +96,23 @@ int main(int argc, char* argv[]) {
     g_feature_pipeline->Read(batch_size, &feats);
     std::vector<std::vector<float>> prob;
     spotter.Forward(feats, &prob);
-    for (int t = 0; t < prob.size(); t++) {
-      std::cout << "keywords prob:";
-      for (int i = 0; i < prob[t].size(); i++) {
-        std::cout << " kw[" << i << "] " << prob[t][i];
+
+    // std::cout << "chunksize: " << feats.size() << std::endl;
+    // std::cout << "prob.size=" << prob.size() << " prob[0].size=" << prob[0].size() << std::endl;
+
+    for (int t = 0; t < prob.size(); t++, frame_count++) {
+      if (skip_size == 0) {
+        for (int i = 0; i < prob[t].size(); i++) {
+          if (prob[t][i] >= threshold) {
+            std::cout << "keyword_index=" << i << " detected" << ", frame_count=" << frame_count << std::endl;
+            skip_size = window_shift;
+            break;
+          }
+        }
+      } else {
+        skip_size--;
+        continue;
       }
-      std::cout << std::endl;
     }
   }
   Pa_CloseStream(stream);
