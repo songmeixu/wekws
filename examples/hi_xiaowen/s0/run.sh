@@ -93,14 +93,25 @@ if [ ${stage} -le 3 ] && [ ${stop_stage} -ge 3 ]; then
     --src_path $dir  \
     --num ${num_average} \
     --val_best
+
   result_dir=$dir/test_$(basename $score_checkpoint)
   mkdir -p $result_dir
+
   python wekws/bin/score.py \
     --config $dir/config.yaml \
     --test_data data/test/data.list \
     --batch_size 256 \
     --checkpoint $score_checkpoint \
     --score_file $result_dir/score.txt  \
+    --num_workers 8
+
+  onnx_model=$(basename $score_checkpoint | sed -e 's:.pt$:.onnx:g')
+  python wekws/bin/score_onnx.py \
+    --config $dir/config.yaml \
+    --test_data data/test/data_tmp.list \
+    --batch_size 1 \
+    --onnx_model $dir/$onnx_model \
+    --score_file $result_dir/score_onnx.txt  \
     --num_workers 8
 
   for keyword in 0 1; do
