@@ -62,8 +62,7 @@ def get_args():
                         action='store_true',
                         default=False,
                         help='Use pinned memory buffers used for reading')
-    args = parser.parse_args()
-    return args
+    return parser.parse_args()
 
 
 def main():
@@ -119,10 +118,9 @@ def main():
                     keyword_scores = score[:, keyword_i]
                     score_frames = ' '.join(['{:.6f}'.format(x)
                                             for x in keyword_scores.tolist()])
-                    fout.write('{} {} {}\n'.format(
-                        key, keyword_i, score_frames))
+                    fout.write(f'{key} {keyword_i} {score_frames}\n')
             if batch_idx % 10 == 0:
-                print('Progress batch {}'.format(batch_idx))
+                print(f'Progress batch {batch_idx}')
                 sys.stdout.flush()
 
 

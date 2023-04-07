@@ -25,11 +25,11 @@ def load_label_and_score(keyword, label_file, score_file):
             arr = line.strip().split()
             key = arr[0]
             current_keyword = arr[1]
-            str_list = arr[2:]
             if int(current_keyword) == keyword:
+                str_list = arr[2:]
                 scores = list(map(float, str_list))
                 if key not in score_table:
-                    score_table.update({key: scores})
+                    score_table[key] = scores
     keyword_table = {}
     filler_table = {}
     filler_duration = 0.0
@@ -41,12 +41,12 @@ def load_label_and_score(keyword, label_file, score_file):
             assert 'duration' in obj
             key = obj['key']
             index = obj['txt']
-            duration = obj['duration']
             assert key in score_table
             if index == keyword:
                 keyword_table[key] = score_table[key]
             else:
                 filler_table[key] = score_table[key]
+                duration = obj['duration']
                 filler_duration += duration
     return keyword_table, filler_table, filler_duration
 
@@ -67,7 +67,7 @@ if __name__ == '__main__':
     window_shift = args.window_shift
     keyword_table, filler_table, filler_duration = load_label_and_score(
         args.keyword, args.test_data, args.score_file)
-    print('Filler total duration Hours: {}'.format(filler_duration / 3600.0))
+    print(f'Filler total duration Hours: {filler_duration / 3600.0}')
     with open(args.stats_file, 'w', encoding='utf8') as fout:
         keyword_index = int(args.keyword)
         threshold = 0.0
