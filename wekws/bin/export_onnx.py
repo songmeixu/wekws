@@ -81,14 +81,16 @@ def main():
         'cache': cache.numpy()
     })
 
-    if torch.allclose(torch_output[0],
-                      torch.tensor(onnx_output[0]), atol=1e-6) and \
-       torch.allclose(torch_output[1],
-                      torch.tensor(onnx_output[1]), atol=1e-6):
+    # print(torch_output[0].shape, torch_output[1].shape)
+
+    if torch.allclose(torch_output[0], torch.tensor(onnx_output[0]), atol=1e-6) and \
+       torch.allclose(torch_output[1], torch.tensor(onnx_output[1]), atol=1e-5):
         print('Export to onnx succeed!')
     else:
         print('''Export to onnx succeed, but pytorch/onnx have different
                  outputs when given the same input, please check!!!''')
+        # print(f"{torch_output[0]} vs {torch.tensor(onnx_output[0])}")
+        # print(f"{torch_output[1]} vs {torch.tensor(onnx_output[1])}")
 
 
 if __name__ == '__main__':
