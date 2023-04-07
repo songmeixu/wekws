@@ -10,10 +10,10 @@ num_keywords=2
 config=conf/mdtc_small.yaml
 norm_mean=true
 norm_var=true
-gpus="0"
+gpus="1"
 
 checkpoint=
-dir=exp/mdtc_small
+dir=exp/mdtc_small_fbank
 
 num_average=30
 score_checkpoint=$dir/avg_${num_average}.pt
